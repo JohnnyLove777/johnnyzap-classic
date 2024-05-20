@@ -11,6 +11,7 @@ const WebSocket = require('ws');
 const socketIo = require('socket.io');
 const http = require('http');
 const https = require('https');
+const OpenAI = require('openai');
 const { spawn } = require('child_process');
 const { promisify } = require('util');
 const writeFileAsync = promisify(fs.writeFile);
@@ -27,7 +28,7 @@ const DATABASE_FILE_TYPEBOT_V3 = 'typebotDBV3.json';
 
 const db_length = 1200;
 
-console.log("Bem-vindo ao JohnnyZap Inteligênte 1.5 - A Integração mais completa Typebot + Whatsapp");
+console.log("Bem-vindo ao JohnnyZap Inteligênte 1.5 - A Integração mais completa Typebot + Whatsapp + OpenAI e ElevenLabs");
 
 // Conectando ao daemon do PM2
 pm2.connect((err) => {

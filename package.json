@@ -13,6 +13,7 @@
     "cors": "^2.8.5",
     "jimp": "^0.22.10",
     "node-fetch": "^2.6.1",
+    "openai": "^4.0.0",    
     "socket.io": "^4.7.4",
     "uuid": "latest",
     "mime-types": "^2.1.35",
