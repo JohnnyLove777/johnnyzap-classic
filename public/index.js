@@ -751,8 +751,15 @@ document.addEventListener('DOMContentLoaded', attachEventListeners);
             
                         <label for="instanciaChave">Chave da Instância Evolution:</label>
                         <input type="text" id="instanciaChave" placeholder="Chave da sua instância Evolution">
-                        <small>Chave da API da sua instância Evolution para autenticação.</small><br>           
-                        
+                        <small>Chave da API da sua instância Evolution para autenticação.</small><br>
+            
+                        <label for="openAIKey">Chave OpenAI (Opcional):</label>
+                        <input type="text" id="openAIKey" placeholder="Sua chave OpenAI">
+                        <small>Chave de API da OpenAI para autenticação.</small><br>
+            
+                        <label for="elevenLabsKey">Chave ElevenLabs (Opcional):</label>
+                        <input type="text" id="elevenLabsKey" placeholder="Sua chave ElevenLabs">
+                        <small>Chave de API da ElevenLabs para autenticação.</small><br>
             
                         <button id="registerTypeZap">Cadastrar Instância</button>
                         <div id="response" style="margin-top: 20px;"></div>
@@ -764,8 +771,8 @@ document.addEventListener('DOMContentLoaded', attachEventListeners);
                     const url = document.getElementById('urlField').value;
                     const instanciaNome = document.getElementById('instanciaNome').value;
                     const instanciaChave = document.getElementById('instanciaChave').value;
-                    const openAIKey = '';
-                    const elevenLabsKey = '';                    
+                    const openAIKey = document.getElementById('openAIKey').value;
+                    const elevenLabsKey = document.getElementById('elevenLabsKey').value;                    
             
                     // Enviar esses valores para o servidor via WebSocket
                     // Verifica se a URL é válida   
