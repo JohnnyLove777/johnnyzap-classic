@@ -753,11 +753,11 @@ document.addEventListener('DOMContentLoaded', attachEventListeners);
                         <input type="text" id="instanciaChave" placeholder="Chave da sua instância Evolution">
                         <small>Chave da API da sua instância Evolution para autenticação.</small><br>
             
-                        <label for="openAIKey">Chave OpenAI (Opcional):</label>
+                        <label for="openAIKey">Chave OpenAI (Apenas para JohnnyZap AI):</label>
                         <input type="text" id="openAIKey" placeholder="Sua chave OpenAI">
                         <small>Chave de API da OpenAI para autenticação.</small><br>
             
-                        <label for="elevenLabsKey">Chave ElevenLabs (Opcional):</label>
+                        <label for="elevenLabsKey">Chave ElevenLabs (Apenas para JohnnyZap AI):</label>
                         <input type="text" id="elevenLabsKey" placeholder="Sua chave ElevenLabs">
                         <small>Chave de API da ElevenLabs para autenticação.</small><br>
             
