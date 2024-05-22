@@ -7,35 +7,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Função para carregar a chave API do arquivo .env
     async function getApiKey() {
-        const response = await fetch('/johnnyzap-classic/.env');
+        const response = await fetch('/johnnyzap/.env');
         const text = await response.text();
         const lines = text.split('\n');
         for (let line of lines) {
-            if (line.startsWith('API_KEY=')) {
+            if (line.startsWith('VALID_API_KEY=')) {
                 return line.split('=')[1].trim();
             }
         }
         return null;
     }
 
-    // Função para mostrar o modal de verificação da chave API
-    function showApiKeyModal() {
-        const modalContent = `
-            <div id="apiKeyModal" class="modal">
-                <div class="modal-content">
-                    <h2>Configurar conexão</h2>
-                    <input type="password" id="apiKeyInput" placeholder="Global API Key">
-                    <button id="connectButton">Conectar</button>
-                    <p id="error-message" class="error-message"></p>
-                </div>
-            </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', modalContent);
-    }
-
     // Função para verificar a chave API
     async function verifyApiKey() {
-        const validApiKey = 'YOUR_SUPER_SECURE_API_KEY';
+        const validApiKey = await getApiKey();
         document.getElementById('connectButton').addEventListener('click', function() {
             const apiKey = document.getElementById('apiKeyInput').value;
             if (apiKey === validApiKey) {
@@ -43,16 +28,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('main-content').style.display = 'block';
             } else {
                 const errorMessage = document.getElementById('error-message');
-                errorMessage.textContent = 'Chave API inválida. Tente novamente.';
                 errorMessage.style.display = 'block';
             }
         });
     }
 
     // Mostrar o modal de verificação de chave API e configurar a verificação
-    showApiKeyModal();
     verifyApiKey();
-
+        
     // Anexa event listeners ao mainContent para delegação
     mainContent.addEventListener('click', function(event) {
         if (event.target.id === 'atualizarLista') {
