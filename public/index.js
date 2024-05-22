@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Função para carregar a chave API do arquivo .env
     async function getApiKey() {
-        const response = await fetch('/johnnyzap/.env');
+        const response = await fetch('/johnnyzap-classic/.env');
         const text = await response.text();
         const lines = text.split('\n');
         for (let line of lines) {
