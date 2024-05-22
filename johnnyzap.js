@@ -3,18 +3,10 @@ const path = require('path');
 const fs = require('fs');
 const app = express();
 const pm2 = require('pm2');
-const fsp = fs.promises; // Para operações assíncronas baseadas em promessas
 const axios = require('axios');
-const Jimp = require('jimp');
-const fetch = require('node-fetch');
 const WebSocket = require('ws');
-const socketIo = require('socket.io');
 const http = require('http');
-const https = require('https');
-const OpenAI = require('openai');
-const { spawn } = require('child_process');
-const { promisify } = require('util');
-const writeFileAsync = promisify(fs.writeFile);
+require('dotenv').config();
 
 const johnny = require('./johnnyFunctions');
 const db = require('./databaseFunctions');
@@ -27,6 +19,9 @@ const DATABASE_FILE_TYPEBOT_V2 = 'typebotDBV2.json';
 const DATABASE_FILE_TYPEBOT_V3 = 'typebotDBV3.json';
 
 const db_length = 1200;
+
+const IP_VPS = process.env.IP_VPS;
+const API_KEY = process.env.API_KEY;
 
 console.log("Bem-vindo ao JohnnyZap Inteligênte 1.5 - A Integração mais completa Typebot + Whatsapp + OpenAI e ElevenLabs");
 
@@ -462,7 +457,7 @@ wss.on('connection', function connection(ws) {
 });
 
 serverWeb.listen(3031, function() {
-    console.log('Servidor do JohnnyZap com o Dashboard em http://localhost:3031');
+    console.log(`Servidor do JohnnyZap com o Dashboard em ${IP_VPS}:3031`);
 });
 
 //Mecanismo para criar pasta

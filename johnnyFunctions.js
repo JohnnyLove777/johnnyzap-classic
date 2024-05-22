@@ -2,8 +2,10 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const mime = require('mime-types');
+require('dotenv').config();
 
-const API_BASE_URL = 'http://localhost:8080';
+const IP_VPS = process.env.IP_VPS;
+const API_BASE_URL = `${IP_VPS}:8080`;
 
 async function EnviarTexto(numeroId, mensagem, delay, apikey, instanceName) {
   const textPostData = {

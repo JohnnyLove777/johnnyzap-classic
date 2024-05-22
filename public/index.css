@@ -715,3 +715,8 @@ body.dark #closeModal {
 #response {
     margin-top: 20px;
 }
+
+.error-message {
+    color: red;
+    display: none;
+}
