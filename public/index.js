@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Função para verificar a chave API
     async function verifyApiKey() {
-        const validApiKey = await getApiKey();
+        const validApiKey = 'YOUR_SUPER_SECURE_API_KEY';
         document.getElementById('connectButton').addEventListener('click', function() {
             const apiKey = document.getElementById('apiKeyInput').value;
             if (apiKey === validApiKey) {
