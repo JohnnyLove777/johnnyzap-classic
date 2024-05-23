@@ -489,14 +489,6 @@ createFolderIfNotExists(imagemPath);
   
 //Fim do mecanismo para criar pasta
 
-// Configs ElevenLabs
-const voice_SETTINGS = {  
-    similarity_boost: 0.75, 
-    stability: 0.5,       
-    style: 0,           
-    use_speaker_boost: true
-};
-
 // Inicializando banco de dados das Instancias
 db.initializeDBSystem();
 // Inicializando banco de dados dos fluxos do Typebot
@@ -678,8 +670,35 @@ async function createSessionJohnny(datafrom, dataid, url_registro, fluxo, instan
             const endereco = enderecoMatch ? enderecoMatch[1] : '';
         
             johnny.EnviarLocalizacao(numeroId, nome, endereco, latitude, longitude, 2000, apiKeyEVO, instanceName);
+          }
+          if (formattedText.startsWith('!lista')) {
+            const regexConteudo = /\[(.*?)\]/g;
+            const matches = [...formattedText.matchAll(regexConteudo)];
+        
+            // Extrair os textos dos colchetes
+            const titulo = matches[0] ? matches[0][1] : '';
+            const subtitulo = matches[1] ? matches[1][1] : '';
+            const descricao = matches[2] ? matches[2][1] : '';
+            const botaoTexto = matches[3] ? matches[3][1] : '';
+            
+            // Extrair as opções (começando da quarta correspondência em diante)
+            const opcoes = matches.slice(4).map(match => match[1]);
+        
+            // Montar as seções com as opções extraídas
+            const secoes = [
+                {
+                    title: titulo,
+                    rows: opcoes.map((opcao, index) => ({
+                        title: opcao,
+                        rowId: `rowId_${index.toString().padStart(3, '0')}`
+                    }))
+                }
+            ];
+        
+            // Enviar a lista com os parâmetros fornecidos
+            johnny.EnviarLista(datafrom, titulo, subtitulo, botaoTexto, descricao, secoes, 3000, apiKeyEVO, instanceName);
           }                                    
-          if (!(formattedText.startsWith('!wait')) && !(formattedText.startsWith('!arquivo')) && !(formattedText.startsWith('!reaction')) && !(formattedText.startsWith('!local')) && !(formattedText.startsWith('!caption')) && !(formattedText.startsWith('!fim')) && !(formattedText.startsWith('!optout')) && !(formattedText.startsWith('!reiniciar')) && !(formattedText.startsWith('!media')) && !(formattedText.startsWith('!directmessage')) && !(formattedText.startsWith('Invalid message. Please, try again.')) && !(formattedText.startsWith('!rapidaagendada')) && !(formattedText.startsWith('!entenderaudio')) && !(formattedText.startsWith('!entenderimagem')) && !(formattedText.startsWith('!audioopenai')) && !(formattedText.startsWith('!audioeleven')) && !(formattedText.startsWith('!imagemopenai'))) {
+          if (!(formattedText.startsWith('!wait')) && !(formattedText.startsWith('!lista')) && !(formattedText.startsWith('!arquivo')) && !(formattedText.startsWith('!reaction')) && !(formattedText.startsWith('!local')) && !(formattedText.startsWith('!caption')) && !(formattedText.startsWith('!fim')) && !(formattedText.startsWith('!optout')) && !(formattedText.startsWith('!reiniciar')) && !(formattedText.startsWith('!media')) && !(formattedText.startsWith('!directmessage')) && !(formattedText.startsWith('Invalid message. Please, try again.')) && !(formattedText.startsWith('!rapidaagendada')) && !(formattedText.startsWith('!entenderaudio')) && !(formattedText.startsWith('!entenderimagem')) && !(formattedText.startsWith('!audioopenai')) && !(formattedText.startsWith('!audioeleven')) && !(formattedText.startsWith('!imagemopenai'))) {
             johnny.EnviarTexto(datafrom, formattedText, 2000, apiKeyEVO, instanceName);  
             //db.updateDelay(datafrom, null);          
           }      
@@ -831,6 +850,10 @@ async function processMessageRMKT(datafrom, messageId, url, name, instanceName, 
   }
 }
 
+app.get('/', (req, res) => {
+  res.send('JohhnyZap Server está OK =)');
+});
+
 // Listener de Mensagem Recebida e Enviada
 app.post('/webhook/messages-upsert', async (req, res) => {
     
@@ -845,7 +868,13 @@ app.post('/webhook/messages-upsert', async (req, res) => {
     return;
     }
     const apiKeyEVO = instanceData.apiKeyEVO;
-    const messageBody = messageData.message.conversation; // Mensagem enviada
+    let messageBody = messageData.message.conversation; // Mensagem enviada
+    // Verificar o tipo de mensagem
+    if (messageData.messageType === 'conversation') {
+    messageBody = messageData.message.conversation;
+    } else if (messageData.messageType === 'listResponseMessage') {
+    messageBody = messageData.message.listResponseMessage.description;
+    }
     const remoteJid = messageData.key.remoteJid; // Numero de wpp do remetente
     const messageId = messageData.key.id; // ID da mensagem original para reações e baixar mídia
   
@@ -1018,8 +1047,35 @@ app.post('/webhook/messages-upsert', async (req, res) => {
                         const endereco = enderecoMatch ? enderecoMatch[1] : '';
                     
                         johnny.EnviarLocalizacao(remoteJid, nome, endereco, latitude, longitude, 2000, apiKeyEVO, instanceName);
+                      }
+                      if (formattedText.startsWith('!lista')) {
+                        const regexConteudo = /\[(.*?)\]/g;
+                        const matches = [...formattedText.matchAll(regexConteudo)];
+                    
+                        // Extrair os textos dos colchetes
+                        const titulo = matches[0] ? matches[0][1] : '';
+                        const subtitulo = matches[1] ? matches[1][1] : '';
+                        const descricao = matches[2] ? matches[2][1] : '';
+                        const botaoTexto = matches[3] ? matches[3][1] : '';
+                        
+                        // Extrair as opções (começando da quarta correspondência em diante)
+                        const opcoes = matches.slice(4).map(match => match[1]);
+                    
+                        // Montar as seções com as opções extraídas
+                        const secoes = [
+                            {
+                                title: titulo,
+                                rows: opcoes.map((opcao, index) => ({
+                                    title: opcao,
+                                    rowId: `rowId_${index.toString().padStart(3, '0')}`
+                                }))
+                            }
+                        ];
+                    
+                        // Enviar a lista com os parâmetros fornecidos
+                        johnny.EnviarLista(remoteJid, titulo, subtitulo, botaoTexto, descricao, secoes, 3000, apiKeyEVO, instanceName);
                       }                          
-                      if (!(formattedText.startsWith('!wait')) && !(formattedText.startsWith('!arquivo')) && !(formattedText.startsWith('!reaction')) && !(formattedText.startsWith('!local')) && !(formattedText.startsWith('!caption')) && !(formattedText.startsWith('!fim')) && !(formattedText.startsWith('!optout')) && !(formattedText.startsWith('!reiniciar')) && !(formattedText.startsWith('!media')) && !(formattedText.startsWith('!directmessage')) && !(formattedText.startsWith('Invalid message. Please, try again.')) && !(formattedText.startsWith('!rapidaagendada')) && !(formattedText.startsWith('!entenderaudio')) && !(formattedText.startsWith('!entenderimagem')) && !(formattedText.startsWith('!audioopenai')) && !(formattedText.startsWith('!audioeleven')) && !(formattedText.startsWith('!imagemopenai'))) {
+                      if (!(formattedText.startsWith('!wait')) && !(formattedText.startsWith('!lista')) && !(formattedText.startsWith('!arquivo')) && !(formattedText.startsWith('!reaction')) && !(formattedText.startsWith('!local')) && !(formattedText.startsWith('!caption')) && !(formattedText.startsWith('!fim')) && !(formattedText.startsWith('!optout')) && !(formattedText.startsWith('!reiniciar')) && !(formattedText.startsWith('!media')) && !(formattedText.startsWith('!directmessage')) && !(formattedText.startsWith('Invalid message. Please, try again.')) && !(formattedText.startsWith('!rapidaagendada')) && !(formattedText.startsWith('!entenderaudio')) && !(formattedText.startsWith('!entenderimagem')) && !(formattedText.startsWith('!audioopenai')) && !(formattedText.startsWith('!audioeleven')) && !(formattedText.startsWith('!imagemopenai'))) {
                         johnny.EnviarTexto(remoteJid, formattedText, 2000, apiKeyEVO, instanceName);  
                         //db.updateDelay(remoteJid, null);
                       }                                                    

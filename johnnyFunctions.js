@@ -191,6 +191,35 @@ async function EnviarLocalizacao(numeroId, nome, endereco, latitude, longitude, 
   );
 }
 
+async function EnviarLista(numeroId, titulo, descricao, textoBotao, textoRodape, secoes, delay, apikey, instanceName) {
+  const listPostData = {
+    number: numeroId,
+    options: {
+      ...(delay !== null && { delay: delay }),
+      presence: 'composing'
+    },
+    listMessage: {
+      title: titulo,
+      description: descricao,
+      buttonText: textoBotao,
+      footerText: textoRodape,
+      sections: secoes
+    }
+  };
+
+  return brokerMaster(
+    axios.post,
+    `${API_BASE_URL}/message/sendList/${instanceName}`,
+    listPostData,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': apikey
+      }
+    }
+  );
+}
+
 async function downloadAndSaveMedia(messageId, mimetype, fileName, apikey, instanceName, convertToMp4 = false) {
   try {
     const data = JSON.stringify({
@@ -565,6 +594,7 @@ module.exports = {
   EnviarAudio,
   EnviarDocumento,
   EnviarReacao,
+  EnviarLista,
   EnviarLocalizacao,
   downloadAndSaveMedia,
   isFromMe,
