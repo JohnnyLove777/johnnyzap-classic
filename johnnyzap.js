@@ -875,7 +875,6 @@ app.post('/webhook/messages-upsert', async (req, res) => {
     } else if (messageData.messageType === 'listResponseMessage') {
     messageBody = messageData.message.listResponseMessage.title;
     }
-    console.log(messageBody);
     const remoteJid = messageData.key.remoteJid; // Numero de wpp do remetente
     const messageId = messageData.key.id; // ID da mensagem original para reações e baixar mídia
   
@@ -920,16 +919,13 @@ app.post('/webhook/messages-upsert', async (req, res) => {
 
                 //const content = await processMessageIA(msg);
                 let content = "N/A";
-                console.log(messageBody);
                 if(messageBody){
                     content = messageBody;
                 }
-                console.log(messageBody);
-                console.log(content);
+                
                 const reqData = {
                   message: content,
                 };
-                console.log(content);
               
                 const config = {
                   method: 'post',
