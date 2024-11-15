@@ -537,6 +537,151 @@ async function waitWithDelay(inputString) {
 }
 
 async function createSessionJohnny(datafrom, dataid, url_registro, fluxo, instanceName, apiKeyEVO) {   
+  const reqData = JSON.stringify({
+      message: {
+          type: "text",
+          text: "string" // Substitua se necessário
+      },
+      isStreamEnabled: true,
+      resultId: "string", // Substitua se necessário
+      isOnlyRegistering: false,
+      prefilledVariables: {
+          number: datafrom.split('@')[0]
+      },
+      textBubbleContentFormat: "richText"
+  });
+
+  const config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: url_registro,
+      headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+      },
+      data: reqData
+  };
+
+  try {
+      const response = await axios.request(config); // Envia a requisição
+
+      const { messages, sessionId } = response.data;
+
+      if (!db.existsDB(datafrom)) {
+          db.addObject(
+              datafrom, 
+              sessionId, 
+              datafrom.replace(/\D/g, ''), 
+              dataid, 
+              'typing', 
+              fluxo, 
+              false, 
+              "active", 
+              false, 
+              false, 
+              null, 
+              null, 
+              null, 
+              instanceName, 
+              db_length
+          );
+      }    
+
+      for (const message of messages) {
+          if (!["text", "image", "audio", "video"].includes(message.type)) {
+              console.log(`Tipo '${message.type}' não permitido. Pulando registro com ID: ${message.id}`);
+              continue; // Pula para a próxima iteração do laço
+          }
+
+          if (message.type === 'text') {
+              let formattedText = '';
+              for (const richText of message.content.richText) {
+                  for (const element of richText.children) {
+                      let text = '';
+
+                      if (element.text) {
+                          text = element.text;
+                      }
+                      if (element.url) {
+                          text = element.url;
+                      } else if (element.type === 'p') {
+                          text = element.children[0].text;             
+                      } else if (element.type === 'inline-variable') {              
+                          text = element.children[0].children[0].text;              
+                      }
+
+                      if (element.bold) {
+                          text = `*${text}*`;
+                      }
+                      if (element.italic) {
+                          text = `_${text}_`;
+                      }
+                      if (element.underline) {
+                          text = `~${text}~`;
+                      }
+
+                      formattedText += text;
+                  }
+                  formattedText += '\n';
+              }
+
+              formattedText = formattedText.replace(/\n$/, '');
+              handleFormattedText(formattedText, datafrom, dataid, apiKeyEVO, instanceName);
+          }
+
+          if (message.type === 'image') {          
+              const url_target = message.content.url;
+              johnny.EnviarImagem(datafrom, url_target, db.readCaption(datafrom), 2000, apiKeyEVO, instanceName);
+              db.updateCaption(datafrom, null);        
+          }
+
+          if (message.type === 'video') {          
+              const url_target = message.content.url;
+              johnny.EnviarVideo(datafrom, url_target, db.readCaption(datafrom), 2000, apiKeyEVO, instanceName);
+              db.updateCaption(datafrom, null);
+          }
+
+          if (message.type === 'audio') {          
+              const url_target = message.content.url;
+              johnny.EnviarAudio(datafrom, url_target, 2000, apiKeyEVO, instanceName);
+          }
+      }
+
+      if (db.existsDB(datafrom)) {
+          db.updateSessionId(datafrom, sessionId);
+          db.updateId(datafrom, dataid);
+          db.updateInteract(datafrom, 'done');
+          db.updateFlow(datafrom, "active");
+          db.updateName(datafrom, fluxo);
+      }
+  } catch (error) {
+      console.error("Erro ao criar a sessão:", error.response?.data || error.message);
+  }
+}
+
+function handleFormattedText(formattedText, datafrom, dataid, apiKeyEVO, instanceName) {
+  if (formattedText.startsWith('!wait')) {
+      waitWithDelay(formattedText);
+  } else if (formattedText.startsWith('!directmessage')) {
+      const partes = formattedText.split(' ');
+      const destino = partes[1];
+      const conteudo = partes.slice(2).join(' ');
+      johnny.EnviarTexto(destino, conteudo, 2000, apiKeyEVO, instanceName);
+  } else if (formattedText.startsWith('!optout')) {
+      if (db.existsDB(datafrom)) {
+          db.updateOptout(datafrom, true);
+          db.removeFromDBTypebotV4(datafrom);
+      }
+  } else if (formattedText.startsWith('!fim')) {
+      if (db.existsDB(datafrom)) {
+          db.updateFlow(datafrom, "inactive");
+      }
+  } else {
+      johnny.EnviarTexto(datafrom, formattedText, 2000, apiKeyEVO, instanceName);
+  }
+}
+
+/*async function createSessionJohnny(datafrom, dataid, url_registro, fluxo, instanceName, apiKeyEVO) {   
   
     const reqData = JSON.stringify({
       isStreamEnabled: true,
@@ -732,7 +877,7 @@ async function createSessionJohnny(datafrom, dataid, url_registro, fluxo, instan
     } catch (error) {
       console.log(error);
     }
-}
+}*/
 
 async function processMessageV2(messageBody, datafrom, dataid, instanceName, apiKeyEVO) {
   const typebotConfigsV2 = db.readJSONFileTypebotV2(DATABASE_FILE_TYPEBOT_V2); // Lê os dados do banco de dados V2
