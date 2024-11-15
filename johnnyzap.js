@@ -563,7 +563,12 @@ async function createSessionJohnny(datafrom, dataid, url_registro, fluxo, instan
   };
 
   try {
-      const response = await axios.request(config); // Envia a requisição
+    console.log("Configuração da requisição:");
+    console.log(JSON.stringify(config, null, 2)); // Exibe a configuração da requisição.
+    
+    const response = await axios.request(config); // Envia a requisição
+    console.log("Resposta da requisição:");
+    console.log(JSON.stringify(response, null, 2)); // Exibe a resposta da requisição    
 
       const { messages, sessionId } = response.data;
 
